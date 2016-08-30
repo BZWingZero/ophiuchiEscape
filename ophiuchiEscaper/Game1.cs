@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace ophiuchiEscaper
 {
@@ -12,10 +13,37 @@ namespace ophiuchiEscaper
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        private Tile tileMapTiles, tileMapGround;
+
+        private int[,] level = new int[,]
+        {
+            {0,0,0,0,0,0,0,0,0,0,0,0 },
+            {0,0,0,0,0,0,0,0,0,0,0,0 },
+            {0,0,0,0,0,0,0,0,0,0,0,0 },
+            {0,0,0,0,0,0,0,0,0,0,0,0 },
+            {0,0,0,0,0,0,0,0,0,0,0,0 },
+            {0,0,0,0,0,0,0,0,0,0,0,0 },
+            {0,0,0,0,0,0,0,0,0,0,0,0 },
+            {0,0,0,0,0,0,0,0,0,0,0,0 }
+        };
+
+        private const int TILE_SIZE = 64;
+        static int TILE_HEIGHT = 128;
+        static int TILE_WIDTH = 128;
+
+        static int SCREEN_HEIGHT = 720;
+        static int SCREEN_WIDTH = SCREEN_HEIGHT / 9 * 16;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            //Sets the size to 720p;
+            graphics.PreferredBackBufferHeight = SCREEN_HEIGHT;
+            graphics.PreferredBackBufferWidth = SCREEN_WIDTH;
+
+            IsMouseVisible = true;
         }
 
         /// <summary>
@@ -40,7 +68,13 @@ namespace ophiuchiEscaper
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            //Loads all of the spritesheets needed
+            Texture2D tiles = Content.Load<Texture2D>(@"spritesheet\spritesheet_tiles");
+            Texture2D ground = Content.Load<Texture2D>(@"spritesheet\spritesheet_ground");
+
+            //Defines the rows and columns for the maps
+            tileMapTiles = new Tile(tiles, 16, 8);
+            tileMapGround = new Tile(ground, 16, 8);
         }
 
         /// <summary>
@@ -62,7 +96,8 @@ namespace ophiuchiEscaper
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            tileMapTiles.Update();
+            tileMapGround.Update();
 
             base.Update(gameTime);
         }
@@ -75,7 +110,14 @@ namespace ophiuchiEscaper
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            for( int i = 0; i < 5; i++) //rows
+            {
+                for( int j = 0; j < 10; j++) //columns
+                {
+                    //tileMapGround.Draw(spriteBatch, new Vector2(j * TILE_SIZE, i * TILE_SIZE), 0);
+                    tileMapGround.Draw(spriteBatch, new Vector2(j * TILE_SIZE, i * TILE_SIZE), level[i, j]);
+                }
+            }
 
             base.Draw(gameTime);
         }
